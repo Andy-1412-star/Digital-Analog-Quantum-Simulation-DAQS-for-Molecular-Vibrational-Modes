@@ -133,4 +133,4 @@ GitHub can generate citation metadata from [`CITATION.cff`](CITATION.cff).
 
 ## License
 
-No software license has been selected yet. Add a `LICENSE` before public release so visitors know how the code may be reused.
+Released under the [MIT License](LICENSE). Copyright © 2026 Andy Wu.

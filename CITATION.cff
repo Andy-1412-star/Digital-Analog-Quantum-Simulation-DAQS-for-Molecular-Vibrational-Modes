@@ -3,8 +3,12 @@ message: "If you use this independent reproducibility repository, cite the softw
 title: "Reproducible H2-reference simulations for digital-analog fermion-boson models"
 type: software
 version: 0.1.0
+date-released: 2026-09-27
+license: MIT
+repository-code: "https://github.com/Andy-1412-star/Digital-Analog-Quantum-Simulation-DAQS-for-Molecular-Vibrational-Modes"
 authors:
-  - name: "Repository contributors"
+  - family-names: Wu
+    given-names: Andy
 preferred-citation:
   type: article
   title: "Digital-analog quantum computing of fermion-boson models in superconducting circuits"

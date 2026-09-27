@@ -113,4 +113,4 @@ python scripts/plot_reference_figures.py
 
 ## 许可证
 
-本仓库暂未指定代码许可证。公开发布前，建议由仓库维护者选择并添加合适的 `LICENSE` 文件。
+本仓库采用 [MIT License](LICENSE)。Copyright © 2026 Andy Wu。
