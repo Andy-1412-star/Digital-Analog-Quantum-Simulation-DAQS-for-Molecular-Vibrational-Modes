@@ -11,7 +11,6 @@ import numpy as np
 
 from daqc import ModelConfig, simulate_closed_open
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = ROOT / "figures"
 

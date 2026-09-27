@@ -98,9 +98,7 @@ def qubit_operator_to_qutip(qubit_operator, n_qubits: int) -> Qobj:
 def build_model(config: ModelConfig = ModelConfig()) -> VibronicModel:
     """Construct electronic, vibrational, and interaction Hamiltonian blocks."""
     config.validate()
-    qubit_hamiltonian = bravyi_kitaev(
-        h2_fermion_hamiltonian(), n_qubits=config.n_qubits
-    )
+    qubit_hamiltonian = bravyi_kitaev(h2_fermion_hamiltonian(), n_qubits=config.n_qubits)
     h_electronic = qubit_operator_to_qutip(qubit_hamiltonian, config.n_qubits)
 
     electronic_identity = tensor([qeye(2) for _ in range(config.n_qubits)])

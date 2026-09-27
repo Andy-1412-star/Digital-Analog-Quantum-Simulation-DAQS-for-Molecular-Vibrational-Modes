@@ -1,4 +1,4 @@
-# Results: H₂-reference vibronic DAQC study
+# Results: H₂-reference vibronic DAQS study
 
 This study asks how Lindblad noise, product-formula order, and bosonic truncation affect a four-qubit H₂-reference electron–vibration simulation. The coefficients are manually supplied reference values; the study evaluates the numerical workflow, not ab-initio chemical accuracy.
 

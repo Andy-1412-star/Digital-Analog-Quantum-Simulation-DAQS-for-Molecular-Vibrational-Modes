@@ -1,8 +1,13 @@
-# Digital-Analog Quantum Computing of Fermion–Boson Models
+# Digital–Analog Quantum Simulation of Fermion–Boson Models
+
+[![repository checks](https://github.com/Andy-1412-star/Digital-Analog-Quantum-Simulation-DAQS-for-Molecular-Vibrational-Modes/actions/workflows/repository-checks.yml/badge.svg)](https://github.com/Andy-1412-star/Digital-Analog-Quantum-Simulation-DAQS-for-Molecular-Vibrational-Modes/actions/workflows/repository-checks.yml)
+[![MIT License](https://img.shields.io/github/license/Andy-1412-star/Digital-Analog-Quantum-Simulation-DAQS-for-Molecular-Vibrational-Modes)](LICENSE)
+[![Python 3.11–3.12](https://img.shields.io/badge/python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![DOI](https://img.shields.io/badge/DOI-10.1038%2Fs41534--025--01001--4-2f6f9f)](https://doi.org/10.1038/s41534-025-01001-4)
 
 [English README](README.md) · [Notebook 索引](docs/notebook-index.md) · [方法说明](docs/methodology.md)
 
-本仓库整理了超导电路中费米子–玻色子模型的数字–模拟量子计算（DAQC）数值实验，涵盖 Hubbard–Holstein、Jaynes–Cummings、分子振动及相关 QuTiP 示例。
+本仓库整理了超导电路中费米子–玻色子模型的数字–模拟量子仿真（DAQS）数值实验，涵盖 Hubbard–Holstein、Jaynes–Cummings、分子振动及相关 QuTiP 示例。仓库使用 **DAQS** 表示这里展示的数值仿真；在引用关联论文及更广义的计算框架时保留 **DAQC**。
 
 研究背景对应论文：
 
@@ -23,6 +28,7 @@
 | [`data/raw`](data/raw) | 论文图所用的原始数值数据 |
 | [`scripts`](scripts) | 绘图、Notebook 清理和仓库检查脚本 |
 | [`figures`](figures) | 可直接预览的结果图 |
+| [`.github`](.github) | CI、依赖更新、Issue 表单和 PR 模板 |
 | [`archive`](archive) | 探索性实验和早期绘图草稿，不作为主入口 |
 
 完整的 Notebook 说明及旧文件名映射见 [`docs/notebook-index.md`](docs/notebook-index.md)。

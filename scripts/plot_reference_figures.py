@@ -9,7 +9,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 # Use a headless backend for normal runs and CI. ``--show`` keeps the user's
 # configured interactive backend when the script is launched from a desktop.
 if "--show" not in sys.argv:
@@ -105,7 +104,9 @@ def plot_dynamics(data_dir: Path) -> plt.Figure:
     ):
         series = (data[:, 1], data[:, 2], data[:, 1] + data[:, 2])
         for values, (label, linestyle, color) in zip(series, occupancy_styles, strict=True):
-            ax.plot(data[:, 0], values, label=label, linestyle=linestyle, color=color, linewidth=1.1)
+            ax.plot(
+                data[:, 0], values, label=label, linestyle=linestyle, color=color, linewidth=1.1
+            )
         ax.set(ylabel=r"$\langle n_{j\uparrow}n_{j\downarrow}\rangle$", ylim=(-0.05, 1.4))
         ax.text(0.03, 0.84, f"{chr(97 + panel)}.", transform=ax.transAxes)
         ax.text(0.66, 0.84, coupling, transform=ax.transAxes)
@@ -113,12 +114,25 @@ def plot_dynamics(data_dir: Path) -> plt.Figure:
 
     axes[1].legend(frameon=False, ncol=3, fontsize=7, loc="upper center")
     axes[2].plot(
-        weak_bosons[:, 0], weak_bosons[:, 1] + weak_bosons[:, 2], "--", color="#d62728", label=r"$g/k=0.1$"
+        weak_bosons[:, 0],
+        weak_bosons[:, 1] + weak_bosons[:, 2],
+        "--",
+        color="#d62728",
+        label=r"$g/k=0.1$",
     )
     axes[2].plot(
-        strong_bosons[:, 0], strong_bosons[:, 1] + strong_bosons[:, 2], "-", color="#25a9d6", label=r"$g/k=5$"
+        strong_bosons[:, 0],
+        strong_bosons[:, 1] + strong_bosons[:, 2],
+        "-",
+        color="#25a9d6",
+        label=r"$g/k=5$",
     )
-    axes[2].set(xlabel=r"$t\,k$", ylabel=r"$\langle n_{\mathrm{ph}}\rangle$", xlim=(0, 20), ylim=(-0.2, 6.75))
+    axes[2].set(
+        xlabel=r"$t\,k$",
+        ylabel=r"$\langle n_{\mathrm{ph}}\rangle$",
+        xlim=(0, 20),
+        ylim=(-0.2, 6.75),
+    )
     axes[2].text(0.03, 0.84, "c.", transform=axes[2].transAxes)
     axes[2].legend(frameon=False, fontsize=7)
     axes[2].grid(alpha=0.18, linewidth=0.5)
@@ -129,7 +143,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
-    parser.add_argument("--use-tex", action="store_true", help="Render labels with a local LaTeX installation.")
+    parser.add_argument(
+        "--use-tex", action="store_true", help="Render labels with a local LaTeX installation."
+    )
     parser.add_argument("--show", action="store_true", help="Display figures after saving them.")
     return parser.parse_args()
 

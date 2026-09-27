@@ -14,7 +14,6 @@ from matplotlib.ticker import NullFormatter
 
 from daqc import ModelConfig, cutoff_observables, simulate_closed_open, trotter_convergence
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 if "--show" not in sys.argv:
@@ -98,25 +97,25 @@ def plot_cutoff(rows: list[dict], destination: Path) -> None:
 
 def write_results_markdown(path: Path, summary: dict) -> None:
     path.write_text(
-        f"""# Results: H₂-reference vibronic DAQC study
+        f"""# Results: H₂-reference vibronic DAQS study
 
 This study asks how Lindblad noise, product-formula order, and bosonic truncation affect a four-qubit H₂-reference electron–vibration simulation. The coefficients are manually supplied reference values; the study evaluates the numerical workflow, not ab-initio chemical accuracy.
 
 ## Configuration
 
-- Bravyi–Kitaev Pauli terms: **{summary['pauli_terms']}**
-- Joint Hilbert-space dimension: **{summary['hilbert_dimension']}**
-- Vibrational cutoff: **{summary['vibrational_levels']}**
-- Coupling: **{summary['coupling']}**; mode frequency: **{summary['omega']}**
-- Open-system parameters: **T1 = {summary['t1']}**, **T2 = {summary['t2']}**
-- Evolution interval: **0–{summary['total_time']}**
+- Bravyi–Kitaev Pauli terms: **{summary["pauli_terms"]}**
+- Joint Hilbert-space dimension: **{summary["hilbert_dimension"]}**
+- Vibrational cutoff: **{summary["vibrational_levels"]}**
+- Coupling: **{summary["coupling"]}**; mode frequency: **{summary["omega"]}**
+- Open-system parameters: **T1 = {summary["t1"]}**, **T2 = {summary["t2"]}**
+- Evolution interval: **0–{summary["total_time"]}**
 
 ## Main findings
 
-1. Vibrational damping and dephasing reduced the final boson occupation from **{summary['final_closed_boson_number']:.6f}** to **{summary['final_open_boson_number']:.6f}** (**{summary['final_boson_reduction_percent']:.1f}%**). The maximum closed/open boson-number separation over the trajectory was **{summary['max_boson_number_separation']:.6f}**.
-2. At **{summary['largest_trotter_steps']}** product-formula steps, Lie–Trotter infidelity was **{summary['lie_infidelity_at_largest_steps']:.3e}**, while Strang infidelity was **{summary['strang_infidelity_at_largest_steps']:.3e}**.
-3. The empirical log–log infidelity slopes versus step count were **{summary['lie_empirical_slope']:.3f}** (Lie) and **{summary['strang_empirical_slope']:.3f}** (Strang), consistent with the expected `steps^-2` and `steps^-4` infidelity scaling for this test.
-4. Increasing the bosonic cutoff from **{summary['minimum_cutoff']}** to **{summary['maximum_cutoff']}** changed the final boson occupation by **{summary['cutoff_boson_number_change']:.3e}**. More importantly for convergence, the change between the final two cutoffs was only **{summary['last_cutoff_boson_number_change']:.3e}** (and **{summary['last_cutoff_z0_change']:.3e}** for `Z0`).
+1. Vibrational damping and dephasing reduced the final boson occupation from **{summary["final_closed_boson_number"]:.6f}** to **{summary["final_open_boson_number"]:.6f}** (**{summary["final_boson_reduction_percent"]:.1f}%**). The maximum closed/open boson-number separation over the trajectory was **{summary["max_boson_number_separation"]:.6f}**.
+2. At **{summary["largest_trotter_steps"]}** product-formula steps, Lie–Trotter infidelity was **{summary["lie_infidelity_at_largest_steps"]:.3e}**, while Strang infidelity was **{summary["strang_infidelity_at_largest_steps"]:.3e}**.
+3. The empirical log–log infidelity slopes versus step count were **{summary["lie_empirical_slope"]:.3f}** (Lie) and **{summary["strang_empirical_slope"]:.3f}** (Strang), consistent with the expected `steps^-2` and `steps^-4` infidelity scaling for this test.
+4. Increasing the bosonic cutoff from **{summary["minimum_cutoff"]}** to **{summary["maximum_cutoff"]}** changed the final boson occupation by **{summary["cutoff_boson_number_change"]:.3e}**. More importantly for convergence, the change between the final two cutoffs was only **{summary["last_cutoff_boson_number_change"]:.3e}** (and **{summary["last_cutoff_z0_change"]:.3e}** for `Z0`).
 
 ## Figures
 
@@ -199,14 +198,10 @@ def main() -> None:
         "final_closed_boson_number": dynamic_rows[-1]["closed_boson_number"],
         "final_open_boson_number": dynamic_rows[-1]["open_boson_number"],
         "final_boson_reduction_percent": 100.0
-        * (
-            dynamic_rows[-1]["closed_boson_number"]
-            - dynamic_rows[-1]["open_boson_number"]
-        )
+        * (dynamic_rows[-1]["closed_boson_number"] - dynamic_rows[-1]["open_boson_number"])
         / dynamic_rows[-1]["closed_boson_number"],
         "max_boson_number_separation": max(
-            abs(row["closed_boson_number"] - row["open_boson_number"])
-            for row in dynamic_rows
+            abs(row["closed_boson_number"] - row["open_boson_number"]) for row in dynamic_rows
         ),
         "largest_trotter_steps": trotter_rows[-1]["steps"],
         "lie_infidelity_at_largest_steps": trotter_rows[-1]["lie_infidelity"],
