@@ -1,0 +1,26 @@
+name: repository-checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate notebooks and data
+        run: python scripts/validate_repository.py
+      - name: Install project and test dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Run unit tests
+        run: pytest
+      - name: Reproduce reference figures
+        run: python scripts/plot_reference_figures.py --output-dir /tmp/daqc-figures
+      - name: Run the closed/open-system portfolio example
+        run: python examples/h2_vibronic_open_system.py --output-dir /tmp/daqc-figures
+      - name: Run the reduced research study
+        run: python experiments/run_h2_study.py --quick --results-dir /tmp/daqc-results --figure-dir /tmp/daqc-figures

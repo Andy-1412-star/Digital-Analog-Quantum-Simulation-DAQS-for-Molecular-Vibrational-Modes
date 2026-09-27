@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this independent reproducibility repository, cite the software and the associated publication."
+title: "Reproducible H2-reference simulations for digital-analog fermion-boson models"
+type: software
+version: 0.1.0
+authors:
+  - name: "Repository contributors"
+preferred-citation:
+  type: article
+  title: "Digital-analog quantum computing of fermion-boson models in superconducting circuits"
+  authors:
+    - family-names: Kumar
+      given-names: Shubham
+    - family-names: Hegade
+      given-names: Narendra N.
+    - family-names: Visuri
+      given-names: Anne-Maria
+    - family-names: Bhargava
+      given-names: Balaganchi A.
+    - family-names: Hernandez
+      given-names: Juan F. R.
+    - family-names: Solano
+      given-names: Enrique
+    - family-names: Albarrán-Arriagada
+      given-names: Francisco
+    - family-names: Alvarado Barrios
+      given-names: Gabriel
+  journal: npj Quantum Information
+  volume: 11
+  year: 2025
+  doi: 10.1038/s41534-025-01001-4
+  url: "https://doi.org/10.1038/s41534-025-01001-4"
