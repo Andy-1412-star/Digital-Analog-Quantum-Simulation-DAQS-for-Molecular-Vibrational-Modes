@@ -64,11 +64,13 @@ jupyter lab
 
 ## Results
 
-The complete reproducible H₂-reference study produces three concrete findings for the documented test parameters:
+The complete reproducible H₂-reference study produces the following concrete findings for the documented test parameters:
 
 - Vibrational damping and dephasing lower the final boson occupation from `0.107630` to `0.075222` (30.1%).
 - At 64 product-formula steps, final-state infidelity is `6.22e-5` for Lie–Trotter and `2.77e-8` for Strang.
 - Raising the bosonic cutoff from 4 to 5 changes the final boson occupation by only `1.83e-5`, supporting convergence of the reported observable.
+- Across a 5 × 5 coupling/noise grid, the largest trajectory-level boson-number separation is `0.1221`, at coupling `0.25` and noise-rate multiplier `2.0`.
+- On the common final-boson-number scale, baseline open-system noise contributes `3.24e-2`, compared with `4.98e-5` from the 64-step product formula and `1.83e-5` from the final cutoff increment.
 
 Full-precision metrics, assumptions, and limitations are in [`RESULTS.md`](RESULTS.md); the underlying tables are in [`results/`](results/README.md).
 
@@ -84,6 +86,14 @@ Bosonic-cutoff convergence:
 
 ![Bosonic cutoff convergence](figures/h2_cutoff_convergence.png)
 
+Coupling × noise parameter sweep:
+
+![Coupling and noise sweep](figures/h2_noise_sweep.png)
+
+Common-observable error budget:
+
+![Observable error budget](figures/h2_error_budget.png)
+
 Additional reference-data reproductions are also retained. Reference fidelity comparison:
 
 ![Fidelity comparison](figures/figure_2_fidelity.png)
@@ -98,7 +108,7 @@ Regenerate both figures with:
 python scripts/plot_reference_figures.py
 ```
 
-Run the complete H₂-reference study—open-system dynamics, product-formula convergence, and bosonic-cutoff convergence—with:
+Run the complete H₂-reference study—open-system dynamics, product-formula and bosonic-cutoff convergence, the coupling/noise sweep, and the observable error budget—with:
 
 ```bash
 python experiments/run_h2_study.py

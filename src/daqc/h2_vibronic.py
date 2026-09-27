@@ -178,6 +178,83 @@ def simulate_closed_open(
     }
 
 
+def noise_parameter_sweep(
+    couplings: Iterable[float],
+    noise_scales: Iterable[float],
+    times: np.ndarray,
+    *,
+    n_vibrational_levels: int,
+    omega: float,
+    baseline_t1: float,
+    baseline_t2: float,
+) -> list[dict[str, float]]:
+    """Sweep coupling and a dimensionless multiplier on the baseline Lindblad rates."""
+    if times.ndim != 1 or len(times) < 2 or np.any(np.diff(times) <= 0):
+        raise ValueError("times must be a strictly increasing one-dimensional array")
+    if baseline_t1 <= 0 or baseline_t2 <= 0:
+        raise ValueError("baseline T1 and T2 must be positive")
+
+    coupling_values = [float(value) for value in couplings]
+    scale_values = [float(value) for value in noise_scales]
+    if not coupling_values or not scale_values:
+        raise ValueError("couplings and noise_scales must not be empty")
+    if any(value < 0 for value in coupling_values):
+        raise ValueError("couplings must be non-negative")
+    if any(value < 0 for value in scale_values):
+        raise ValueError("noise scales must be non-negative")
+
+    baseline_gamma_down = 1.0 / baseline_t1
+    baseline_gamma_phi = max(0.0, 1.0 / baseline_t2 - 1.0 / (2.0 * baseline_t1))
+    rows: list[dict[str, float]] = []
+
+    for coupling in coupling_values:
+        config = ModelConfig(
+            n_vibrational_levels=n_vibrational_levels,
+            omega=omega,
+            coupling=coupling,
+        )
+        model = build_model(config)
+        initial_state = reference_initial_state(config)
+        observables = [model.number, model.z0]
+        closed = sesolve(model.h_total, initial_state, times, e_ops=observables)
+        closed_number = np.asarray(closed.expect[0], dtype=float)
+        closed_z0 = np.asarray(closed.expect[1], dtype=float)
+        baseline_c_ops = collapse_operators(model, baseline_t1, baseline_t2)
+
+        for noise_scale in scale_values:
+            if noise_scale == 0.0:
+                open_number = closed_number
+                open_z0 = closed_z0
+            else:
+                scaled_c_ops = [np.sqrt(noise_scale) * operator for operator in baseline_c_ops]
+                opened = mesolve(
+                    model.h_total,
+                    initial_state,
+                    times,
+                    c_ops=scaled_c_ops,
+                    e_ops=observables,
+                )
+                open_number = np.asarray(opened.expect[0], dtype=float)
+                open_z0 = np.asarray(opened.expect[1], dtype=float)
+
+            rows.append(
+                {
+                    "coupling": coupling,
+                    "noise_scale": noise_scale,
+                    "gamma_down": noise_scale * baseline_gamma_down,
+                    "gamma_phi": noise_scale * baseline_gamma_phi,
+                    "final_closed_boson_number": float(closed_number[-1]),
+                    "final_open_boson_number": float(open_number[-1]),
+                    "max_boson_number_separation": float(
+                        np.max(np.abs(closed_number - open_number))
+                    ),
+                    "final_closed_z0": float(closed_z0[-1]),
+                    "final_open_z0": float(open_z0[-1]),
+                }
+            )
+    return rows
+
+
 def _pure_state_fidelity(reference: Qobj, state: Qobj) -> float:
     return float(abs(reference.overlap(state)) ** 2)
 
@@ -193,6 +270,7 @@ def trotter_convergence(
     model = build_model(config)
     initial_state = reference_initial_state(config)
     exact_state = (-1j * model.h_total * total_time).expm() * initial_state
+    exact_boson_number = float(np.real(expect(model.number, exact_state)))
     rows: list[dict[str, float | int]] = []
 
     for steps in step_counts:
@@ -211,6 +289,8 @@ def trotter_convergence(
 
         lie_fidelity = _pure_state_fidelity(exact_state, lie_state)
         strang_fidelity = _pure_state_fidelity(exact_state, strang_state)
+        lie_boson_number = float(np.real(expect(model.number, lie_state)))
+        strang_boson_number = float(np.real(expect(model.number, strang_state)))
         rows.append(
             {
                 "steps": steps,
@@ -219,6 +299,8 @@ def trotter_convergence(
                 "lie_infidelity": max(0.0, 1.0 - lie_fidelity),
                 "strang_fidelity": strang_fidelity,
                 "strang_infidelity": max(0.0, 1.0 - strang_fidelity),
+                "lie_boson_number_error": abs(lie_boson_number - exact_boson_number),
+                "strang_boson_number_error": abs(strang_boson_number - exact_boson_number),
             }
         )
     return rows

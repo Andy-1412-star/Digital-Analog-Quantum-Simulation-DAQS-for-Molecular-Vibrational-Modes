@@ -36,6 +36,8 @@ The standalone example models zero-temperature vibrational damping with
 `sqrt(1/T1) * a` and pure dephasing with `sqrt(2*gamma_phi) * a†a`, where
 `gamma_phi = max(0, 1/T2 - 1/(2*T1))`.
 
+The extended parameter sweep multiplies both baseline Lindblad rates by a dimensionless noise scale. A scale of zero is exactly the closed-system reference; a scale of one corresponds to `T1 = 5` and `T2 = 4`. This construction changes the overall noise strength without changing the baseline ratio between damping and pure dephasing.
+
 ## Digital–analog product formula
 
 The Hubbard–Holstein notebooks split the Hamiltonian into an analog block and a hopping block. A first-order Lie–Trotter step is
@@ -51,6 +53,10 @@ e^{-iH_{\mathrm{analog}}\Delta t}.
 The reproducible H₂-reference study in `experiments/run_h2_study.py` also splits the Hamiltonian into free and interaction blocks. It compares first-order Lie–Trotter and symmetric second-order Strang propagation against the exact matrix exponential. Because the reported metric is infidelity (the squared state-error scale), the expected asymptotic slopes are approximately `steps^-2` and `steps^-4`, respectively.
 
 The initial electronic state is `( |0> + |1> ) / sqrt(2) ⊗ |000>` and the oscillator starts in its vacuum. This deliberately non-stationary numerical reference state makes the dynamics and approximation errors visible; it is not presented as an H₂ ground-state preparation protocol.
+
+## Observable error budget
+
+The error-budget comparison uses the absolute change in the final boson occupation, so every bar has the same units and observable definition. It compares the baseline open/closed difference, Lie–Trotter and Strang errors at the largest tested step count, and the difference between the two largest bosonic cutoffs. These quantities have different physical origins and should not be interpreted as statistically independent uncertainties.
 
 ## Important limitations
 

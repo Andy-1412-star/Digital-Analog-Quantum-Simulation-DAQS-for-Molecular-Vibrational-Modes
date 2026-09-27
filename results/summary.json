@@ -14,11 +14,22 @@
   "largest_trotter_steps": 64,
   "lie_infidelity_at_largest_steps": 6.215077775084676e-05,
   "strang_infidelity_at_largest_steps": 2.7721733575347685e-08,
+  "lie_boson_number_error": 4.982665138897335e-05,
+  "strang_boson_number_error": 4.9826651388834575e-05,
   "lie_empirical_slope": -2.151592708117435,
   "strang_empirical_slope": -4.214335356917014,
   "minimum_cutoff": 2,
   "maximum_cutoff": 5,
   "cutoff_boson_number_change": 0.001947583520754359,
   "last_cutoff_boson_number_change": 1.826780847957732e-05,
-  "last_cutoff_z0_change": 3.0124162866740356e-05
+  "last_cutoff_z0_change": 3.0124162866740356e-05,
+  "noise_boson_number_error": 0.03240816218659985,
+  "noise_sweep_points": 25,
+  "noise_sweep_min_coupling": 0.05,
+  "noise_sweep_max_coupling": 0.25,
+  "noise_sweep_min_scale": 0.0,
+  "noise_sweep_max_scale": 2.0,
+  "noise_sweep_strongest_coupling": 0.25,
+  "noise_sweep_strongest_scale": 2.0,
+  "noise_sweep_max_separation": 0.12206239658247187
 }

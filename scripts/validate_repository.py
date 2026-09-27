@@ -37,6 +37,8 @@ EXPECTED_RESULT_COLUMNS = {
         "lie_infidelity",
         "strang_fidelity",
         "strang_infidelity",
+        "lie_boson_number_error",
+        "strang_boson_number_error",
     },
     "cutoff_convergence.csv": {
         "vibrational_levels",
@@ -44,7 +46,24 @@ EXPECTED_RESULT_COLUMNS = {
         "boson_number",
         "z0",
     },
+    "noise_sweep.csv": {
+        "coupling",
+        "noise_scale",
+        "gamma_down",
+        "gamma_phi",
+        "final_closed_boson_number",
+        "final_open_boson_number",
+        "max_boson_number_separation",
+        "final_closed_z0",
+        "final_open_z0",
+    },
+    "error_budget.csv": {
+        "source",
+        "absolute_boson_number_error",
+    },
 }
+
+NON_NUMERIC_RESULT_COLUMNS = {"error_budget.csv": {"source"}}
 
 
 def check_notebooks(errors: list[str]) -> int:
@@ -128,7 +147,11 @@ def check_generated_results(errors: list[str]) -> int:
             errors.append(f"No result rows in {path.relative_to(ROOT)}")
         for line_number, row in enumerate(rows, start=2):
             try:
-                values = [float(value) for value in row.values()]
+                values = [
+                    float(value)
+                    for key, value in row.items()
+                    if key not in NON_NUMERIC_RESULT_COLUMNS.get(filename, set())
+                ]
             except (TypeError, ValueError):
                 errors.append(f"Non-numeric result in {path.relative_to(ROOT)}:{line_number}")
                 continue

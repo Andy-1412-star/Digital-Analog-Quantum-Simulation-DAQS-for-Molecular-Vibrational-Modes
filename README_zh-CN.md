@@ -67,7 +67,7 @@ python -m pip install -e .
 python examples/h2_vibronic_open_system.py
 ```
 
-完整生成开放系统、Trotter 收敛和玻色截断结果：
+完整生成开放系统、Trotter 收敛、玻色截断、耦合–噪声扫描和误差预算结果：
 
 ```bash
 python experiments/run_h2_study.py
@@ -80,6 +80,8 @@ python experiments/run_h2_study.py
 - 振动阻尼与退相干使末态玻色占据数从 `0.107630` 降至 `0.075222`，降幅约 30.1%。
 - 使用 64 个乘积公式步时，Lie–Trotter 末态不保真度为 `6.22e-5`，Strang 为 `2.77e-8`。
 - 玻色截断从 4 增至 5 时，末态玻色占据数仅变化 `1.83e-5`，说明该可观测量已基本收敛。
+- 在 5 × 5 的耦合–噪声参数网格中，轨迹层面的最大玻色占据数差为 `0.1221`，对应耦合 `0.25`、噪声速率倍率 `2.0`。
+- 在统一的末态玻色占据数尺度上，基准开放系统噪声误差为 `3.24e-2`，64 步乘积公式误差为 `4.98e-5`，最后一次玻色截断增量为 `1.83e-5`。
 
 完整精度数据、假设和局限见 [`RESULTS.md`](RESULTS.md)，CSV/JSON 原始结果及字段定义见 [`results/`](results/README.md)。
 
@@ -88,6 +90,10 @@ python experiments/run_h2_study.py
 ![Lie-Trotter and Strang convergence](figures/h2_trotter_convergence.png)
 
 ![Bosonic cutoff convergence](figures/h2_cutoff_convergence.png)
+
+![Coupling and noise sweep](figures/h2_noise_sweep.png)
+
+![Observable error budget](figures/h2_error_budget.png)
 
 部分分子模拟需要较大的 Hilbert 空间，运行前请先减小玻色截断维数或时间采样点进行试跑。
 

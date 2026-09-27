@@ -12,7 +12,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import NullFormatter
 
-from daqc import ModelConfig, cutoff_observables, simulate_closed_open, trotter_convergence
+from daqc import (
+    ModelConfig,
+    cutoff_observables,
+    noise_parameter_sweep,
+    simulate_closed_open,
+    trotter_convergence,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -95,6 +101,79 @@ def plot_cutoff(rows: list[dict], destination: Path) -> None:
     plt.close(fig)
 
 
+def plot_noise_sweep(rows: list[dict], destination: Path) -> None:
+    couplings = sorted({row["coupling"] for row in rows})
+    noise_scales = sorted({row["noise_scale"] for row in rows})
+    index = {(row["coupling"], row["noise_scale"]): row for row in rows}
+    fields = (
+        ("max_boson_number_separation", r"max $|\Delta\langle a^\dagger a\rangle|$"),
+        ("final_open_boson_number", r"final open $\langle a^\dagger a\rangle$"),
+    )
+    fig, axes = plt.subplots(1, 2, figsize=(8.0, 3.2), constrained_layout=True)
+    for ax, (field, title) in zip(axes, fields, strict=True):
+        values = np.asarray(
+            [[index[(coupling, scale)][field] for scale in noise_scales] for coupling in couplings]
+        )
+        image = ax.imshow(values, origin="lower", aspect="auto", cmap="viridis")
+        ax.set_xticks(range(len(noise_scales)), [f"{value:g}" for value in noise_scales])
+        ax.set_yticks(range(len(couplings)), [f"{value:g}" for value in couplings])
+        ax.set(xlabel="noise-rate multiplier", ylabel="coupling g", title=title)
+        fig.colorbar(image, ax=ax, shrink=0.86)
+    fig.savefig(destination, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+
+
+def error_budget_rows(
+    dynamic_rows: list[dict], trotter_rows: list[dict], cutoff_rows: list[dict]
+) -> list[dict[str, str | float]]:
+    """Return comparable final boson-number errors for the baseline configuration."""
+    return [
+        {
+            "source": "open-system noise",
+            "absolute_boson_number_error": abs(
+                dynamic_rows[-1]["closed_boson_number"] - dynamic_rows[-1]["open_boson_number"]
+            ),
+        },
+        {
+            "source": "Lie-Trotter",
+            "absolute_boson_number_error": trotter_rows[-1]["lie_boson_number_error"],
+        },
+        {
+            "source": "Strang",
+            "absolute_boson_number_error": trotter_rows[-1]["strang_boson_number_error"],
+        },
+        {
+            "source": "bosonic cutoff",
+            "absolute_boson_number_error": abs(
+                cutoff_rows[-1]["boson_number"] - cutoff_rows[-2]["boson_number"]
+            ),
+        },
+    ]
+
+
+def plot_error_budget(rows: list[dict], destination: Path) -> None:
+    labels = [row["source"] for row in rows]
+    errors = np.asarray([row["absolute_boson_number_error"] for row in rows])
+    colors = ["#d62728", "#3569b7", "#ff7f0e", "#2ca02c"]
+    fig, ax = plt.subplots(figsize=(5.8, 3.4), constrained_layout=True)
+    bars = ax.bar(labels, errors, color=colors)
+    ax.set_yscale("log")
+    ax.set_ylabel(r"absolute final $\langle a^\dagger a\rangle$ error")
+    ax.tick_params(axis="x", rotation=18)
+    ax.grid(axis="y", which="both", alpha=0.2)
+    for bar, value in zip(bars, errors, strict=True):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            value * 1.2,
+            f"{value:.1e}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
+    fig.savefig(destination, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+
+
 def write_results_markdown(path: Path, summary: dict) -> None:
     path.write_text(
         f"""# Results: H₂-reference vibronic DAQS study
@@ -116,6 +195,8 @@ This study asks how Lindblad noise, product-formula order, and bosonic truncatio
 2. At **{summary["largest_trotter_steps"]}** product-formula steps, Lie–Trotter infidelity was **{summary["lie_infidelity_at_largest_steps"]:.3e}**, while Strang infidelity was **{summary["strang_infidelity_at_largest_steps"]:.3e}**.
 3. The empirical log–log infidelity slopes versus step count were **{summary["lie_empirical_slope"]:.3f}** (Lie) and **{summary["strang_empirical_slope"]:.3f}** (Strang), consistent with the expected `steps^-2` and `steps^-4` infidelity scaling for this test.
 4. Increasing the bosonic cutoff from **{summary["minimum_cutoff"]}** to **{summary["maximum_cutoff"]}** changed the final boson occupation by **{summary["cutoff_boson_number_change"]:.3e}**. More importantly for convergence, the change between the final two cutoffs was only **{summary["last_cutoff_boson_number_change"]:.3e}** (and **{summary["last_cutoff_z0_change"]:.3e}** for `Z0`).
+5. Across **{summary["noise_sweep_points"]}** coupling/noise combinations, the largest trajectory-level boson-number separation was **{summary["noise_sweep_max_separation"]:.3e}**, at coupling **{summary["noise_sweep_strongest_coupling"]}** and noise-rate multiplier **{summary["noise_sweep_strongest_scale"]}**.
+6. On the common final-boson-number scale, the baseline errors were **{summary["noise_boson_number_error"]:.3e}** (noise), **{summary["lie_boson_number_error"]:.3e}** (Lie–Trotter), **{summary["strang_boson_number_error"]:.3e}** (Strang), and **{summary["last_cutoff_boson_number_change"]:.3e}** (last cutoff increment). These sources have different physical meanings; the shared observable makes their numerical sizes directly comparable.
 
 ## Figures
 
@@ -124,6 +205,10 @@ This study asks how Lindblad noise, product-formula order, and bosonic truncatio
 ![Product-formula convergence](figures/h2_trotter_convergence.png)
 
 ![Bosonic cutoff convergence](figures/h2_cutoff_convergence.png)
+
+![Coupling and noise sweep](figures/h2_noise_sweep.png)
+
+![Observable error budget](figures/h2_error_budget.png)
 
 ## Reproduce
 
@@ -154,9 +239,12 @@ def main() -> None:
     if args.quick:
         cutoff, time_points = 2, 21
         step_counts, cutoff_levels = [4, 8], [2, 3]
+        sweep_couplings, sweep_noise_scales = [0.10, 0.15], [0.0, 1.0]
     else:
         cutoff, time_points = 3, 81
         step_counts, cutoff_levels = [4, 8, 16, 32, 64], [2, 3, 4, 5]
+        sweep_couplings = [0.05, 0.10, 0.15, 0.20, 0.25]
+        sweep_noise_scales = [0.0, 0.5, 1.0, 1.5, 2.0]
 
     total_time, omega, coupling, t1, t2 = 6.0, 1.0, 0.15, 5.0, 4.0
     config = ModelConfig(
@@ -164,9 +252,10 @@ def main() -> None:
         omega=omega,
         coupling=coupling,
     )
+    times = np.linspace(0.0, total_time, time_points)
     dynamics = simulate_closed_open(
         config,
-        np.linspace(0.0, total_time, time_points),
+        times,
         t1=t1,
         t2=t2,
     )
@@ -178,13 +267,29 @@ def main() -> None:
         coupling=coupling,
         final_time=total_time,
     )
+    sweep_rows = noise_parameter_sweep(
+        sweep_couplings,
+        sweep_noise_scales,
+        times,
+        n_vibrational_levels=cutoff,
+        omega=omega,
+        baseline_t1=t1,
+        baseline_t2=t2,
+    )
+    budget_rows = error_budget_rows(dynamic_rows, trotter_rows, cutoff_rows)
 
     write_csv(args.results_dir / "dynamics.csv", dynamic_rows)
     write_csv(args.results_dir / "trotter_convergence.csv", trotter_rows)
     write_csv(args.results_dir / "cutoff_convergence.csv", cutoff_rows)
+    write_csv(args.results_dir / "noise_sweep.csv", sweep_rows)
+    write_csv(args.results_dir / "error_budget.csv", budget_rows)
     plot_dynamics(dynamic_rows, args.figure_dir / "h2_closed_open_dynamics.png")
     plot_trotter(trotter_rows, args.figure_dir / "h2_trotter_convergence.png")
     plot_cutoff(cutoff_rows, args.figure_dir / "h2_cutoff_convergence.png")
+    plot_noise_sweep(sweep_rows, args.figure_dir / "h2_noise_sweep.png")
+    plot_error_budget(budget_rows, args.figure_dir / "h2_error_budget.png")
+
+    strongest_noise_row = max(sweep_rows, key=lambda row: row["max_boson_number_separation"])
 
     summary = {
         "pauli_terms": dynamics["pauli_terms"],
@@ -206,6 +311,8 @@ def main() -> None:
         "largest_trotter_steps": trotter_rows[-1]["steps"],
         "lie_infidelity_at_largest_steps": trotter_rows[-1]["lie_infidelity"],
         "strang_infidelity_at_largest_steps": trotter_rows[-1]["strang_infidelity"],
+        "lie_boson_number_error": trotter_rows[-1]["lie_boson_number_error"],
+        "strang_boson_number_error": trotter_rows[-1]["strang_boson_number_error"],
         "lie_empirical_slope": empirical_slope(trotter_rows, "lie_infidelity"),
         "strang_empirical_slope": empirical_slope(trotter_rows, "strang_infidelity"),
         "minimum_cutoff": cutoff_rows[0]["vibrational_levels"],
@@ -217,6 +324,15 @@ def main() -> None:
             cutoff_rows[-1]["boson_number"] - cutoff_rows[-2]["boson_number"]
         ),
         "last_cutoff_z0_change": abs(cutoff_rows[-1]["z0"] - cutoff_rows[-2]["z0"]),
+        "noise_boson_number_error": budget_rows[0]["absolute_boson_number_error"],
+        "noise_sweep_points": len(sweep_rows),
+        "noise_sweep_min_coupling": min(sweep_couplings),
+        "noise_sweep_max_coupling": max(sweep_couplings),
+        "noise_sweep_min_scale": min(sweep_noise_scales),
+        "noise_sweep_max_scale": max(sweep_noise_scales),
+        "noise_sweep_strongest_coupling": strongest_noise_row["coupling"],
+        "noise_sweep_strongest_scale": strongest_noise_row["noise_scale"],
+        "noise_sweep_max_separation": strongest_noise_row["max_boson_number_separation"],
     }
     (args.results_dir / "summary.json").write_text(
         json.dumps(summary, indent=2) + "\n", encoding="utf-8"
