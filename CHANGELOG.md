@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [Unreleased]
 
+### Added
+
+- Coupling/noise parameter sweep with machine-readable output and a heatmap.
+- Common-observable error budget for noise, product-formula, and bosonic-cutoff effects.
+
 ## [0.1.0] - 2026-09-27
 
 ### Added

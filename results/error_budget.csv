@@ -1,0 +1,5 @@
+source,absolute_boson_number_error
+open-system noise,0.03240816218659985
+Lie-Trotter,4.982665138897335e-05
+Strang,4.9826651388834575e-05
+bosonic cutoff,1.826780847957732e-05

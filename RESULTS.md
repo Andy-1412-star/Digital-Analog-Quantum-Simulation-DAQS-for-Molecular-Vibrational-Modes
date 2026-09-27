@@ -17,6 +17,8 @@ This study asks how Lindblad noise, product-formula order, and bosonic truncatio
 2. At **64** product-formula steps, Lie–Trotter infidelity was **6.215e-05**, while Strang infidelity was **2.772e-08**.
 3. The empirical log–log infidelity slopes versus step count were **-2.152** (Lie) and **-4.214** (Strang), consistent with the expected `steps^-2` and `steps^-4` infidelity scaling for this test.
 4. Increasing the bosonic cutoff from **2** to **5** changed the final boson occupation by **1.948e-03**. More importantly for convergence, the change between the final two cutoffs was only **1.827e-05** (and **3.012e-05** for `Z0`).
+5. Across **25** coupling/noise combinations, the largest trajectory-level boson-number separation was **1.221e-01**, at coupling **0.25** and noise-rate multiplier **2.0**.
+6. On the common final-boson-number scale, the baseline errors were **3.241e-02** (noise), **4.983e-05** (Lie–Trotter), **4.983e-05** (Strang), and **1.827e-05** (last cutoff increment). These sources have different physical meanings; the shared observable makes their numerical sizes directly comparable.
 
 ## Figures
 
@@ -25,6 +27,10 @@ This study asks how Lindblad noise, product-formula order, and bosonic truncatio
 ![Product-formula convergence](figures/h2_trotter_convergence.png)
 
 ![Bosonic cutoff convergence](figures/h2_cutoff_convergence.png)
+
+![Coupling and noise sweep](figures/h2_noise_sweep.png)
+
+![Observable error budget](figures/h2_error_budget.png)
 
 ## Reproduce
 
