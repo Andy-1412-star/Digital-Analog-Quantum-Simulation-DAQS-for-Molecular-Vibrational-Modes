@@ -1,8 +1,15 @@
 # Digital–Analog Quantum Simulation of Fermion–Boson Models
 
+[![repository checks](https://github.com/Andy-1412-star/Digital-Analog-Quantum-Simulation-DAQS-for-Molecular-Vibrational-Modes/actions/workflows/repository-checks.yml/badge.svg)](https://github.com/Andy-1412-star/Digital-Analog-Quantum-Simulation-DAQS-for-Molecular-Vibrational-Modes/actions/workflows/repository-checks.yml)
+[![MIT License](https://img.shields.io/github/license/Andy-1412-star/Digital-Analog-Quantum-Simulation-DAQS-for-Molecular-Vibrational-Modes)](LICENSE)
+[![Python 3.11–3.12](https://img.shields.io/badge/python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![DOI](https://img.shields.io/badge/DOI-10.1038%2Fs41534--025--01001--4-2f6f9f)](https://doi.org/10.1038/s41534-025-01001-4)
+
 [中文说明](README_zh-CN.md) · [Notebook index](docs/notebook-index.md) · [Methods](docs/methodology.md)
 
 A research portfolio repository for mapping second-quantized electronic Hamiltonians to qubit operators and simulating coupled electronic–vibrational dynamics. The workflows combine **OpenFermion** for fermion-to-qubit transformations with **QuTiP** for closed- and open-system dynamics, plus product-formula studies for digital–analog simulation.
+
+**Terminology.** This repository uses **DAQS** for the simulated digital–analog quantum dynamics presented here. **DAQC** is retained when referring to the broader computing framework and the associated publication.
 
 ## What this project demonstrates
 
@@ -11,7 +18,7 @@ A research portfolio repository for mapping second-quantized electronic Hamilton
 - Coupling of encoded electronic degrees of freedom to truncated bosonic modes.
 - Comparison of unitary Schrödinger evolution and Lindblad master-equation dynamics.
 - First-order Lie–Trotter and second-order Strang decompositions benchmarked against exact propagation, with committed convergence data.
-- Reproducible plotting of the reference DAQC fidelity and Hubbard–Holstein dynamics data.
+- Reproducible plotting of the reference digital–analog fidelity and Hubbard–Holstein dynamics data.
 
 ```mermaid
 flowchart LR
@@ -105,11 +112,13 @@ python experiments/run_h2_study.py
 | `experiments/` | Parameterized studies that generate results and figures |
 | `src/daqc/` | Reusable model, noise, and product-formula implementation |
 | `results/` | Machine-readable outputs from the complete study |
+| `tests/` | Unit tests for model construction, dynamics, and convergence |
 | `notebooks/applications/` | Molecular and H₂ simulation studies |
 | `notebooks/models/` | Hubbard–Holstein, Jaynes–Cummings, iSWAP, and trajectory models |
 | `notebooks/tutorials/` | QuTiP and QuTiP-QIP learning material |
 | `data/raw/` | Numerical data used by the reference plots |
 | `scripts/` | Plotting, notebook cleaning, and validation tools |
+| `.github/` | CI, dependency updates, issue forms, and the PR template |
 | `archive/` | Early experiments retained for provenance, not presented as validated results |
 
 See [`docs/notebook-index.md`](docs/notebook-index.md) for the complete notebook catalogue and original filename mapping.

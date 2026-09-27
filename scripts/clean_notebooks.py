@@ -7,7 +7,6 @@ import hashlib
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SEARCH_DIRS = (ROOT / "notebooks", ROOT / "archive")
 
@@ -54,7 +53,11 @@ def clean_notebook(path: Path) -> bool:
             {
                 "cell_type": "markdown",
                 "metadata": {},
-                "source": [f"# {title}\n", "\n", "Cleaned and organized for reproducible execution from the repository root.\n"],
+                "source": [
+                    f"# {title}\n",
+                    "\n",
+                    "Cleaned and organized for reproducible execution from the repository root.\n",
+                ],
             },
         )
         metadata["repository_title_added"] = True
@@ -84,7 +87,9 @@ def clean_notebook(path: Path) -> bool:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="Report dirty notebooks without modifying them.")
+    parser.add_argument(
+        "--check", action="store_true", help="Report dirty notebooks without modifying them."
+    )
     args = parser.parse_args()
 
     dirty: list[Path] = []

@@ -4,18 +4,36 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-checks-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
+          cache: pip
       - name: Validate notebooks and data
         run: python scripts/validate_repository.py
       - name: Install project and test dependencies
         run: python -m pip install -e ".[dev]"
+      - name: Check Python style
+        run: |
+          ruff check src examples experiments scripts tests
+          ruff format --check src examples experiments scripts tests
+      - name: Build source and wheel distributions
+        run: python -m build
       - name: Run unit tests
         run: pytest
       - name: Reproduce reference figures

@@ -8,7 +8,6 @@ import math
 import re
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 LOCAL_PATH = re.compile(r"(?:[A-Za-z]:\\(?:Users|home)\\|/(?:Users|home)/)")
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((?!https?://|mailto:|#)([^)]+)\)")
@@ -49,7 +48,9 @@ EXPECTED_RESULT_COLUMNS = {
 
 
 def check_notebooks(errors: list[str]) -> int:
-    paths = sorted((ROOT / "notebooks").rglob("*.ipynb")) + sorted((ROOT / "archive").rglob("*.ipynb"))
+    paths = sorted((ROOT / "notebooks").rglob("*.ipynb")) + sorted(
+        (ROOT / "archive").rglob("*.ipynb")
+    )
     for path in paths:
         try:
             notebook = json.loads(path.read_text(encoding="utf-8"))
@@ -63,7 +64,9 @@ def check_notebooks(errors: list[str]) -> int:
         for index, cell in enumerate(notebook.get("cells", [])):
             if not cell.get("id"):
                 errors.append(f"Missing cell id in {path.relative_to(ROOT)} cell {index}")
-            if cell.get("cell_type") == "code" and (cell.get("outputs") or cell.get("execution_count") is not None):
+            if cell.get("cell_type") == "code" and (
+                cell.get("outputs") or cell.get("execution_count") is not None
+            ):
                 errors.append(f"Transient output in {path.relative_to(ROOT)} cell {index}")
             source = "".join(cell.get("source", []))
             if LOCAL_PATH.search(source):
@@ -139,10 +142,11 @@ def check_generated_results(errors: list[str]) -> int:
         errors.append(f"Invalid generated summary {summary_path.relative_to(ROOT)}: {exc}")
     else:
         if not summary or not all(
-            isinstance(value, (int, float)) and math.isfinite(value)
-            for value in summary.values()
+            isinstance(value, (int, float)) and math.isfinite(value) for value in summary.values()
         ):
-            errors.append(f"Generated summary contains invalid values: {summary_path.relative_to(ROOT)}")
+            errors.append(
+                f"Generated summary contains invalid values: {summary_path.relative_to(ROOT)}"
+            )
     return len(EXPECTED_RESULT_COLUMNS) + 1
 
 
